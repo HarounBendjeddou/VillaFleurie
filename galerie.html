@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Galerie — La Villa Fleurie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #FAF7F2;
+      --warm-white: #FDF9F4;
+      --sage: #8A9E84;
+      --sage-light: #B5C9B0;
+      --sage-dark: #5C7A56;
+      --terracotta: #C4785A;
+      --terracotta-light: #E8A98C;
+      --brown: #6B4F3A;
+      --text: #2C2418;
+      --text-light: #7A6A58;
+      --border: rgba(138,158,132,0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(250,247,242,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 600; color: var(--sage-dark);
+      letter-spacing: .04em; text-decoration: none;
+    }
+    .nav-logo span { font-style: italic; font-weight: 300; color: var(--terracotta); }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      font-size: .8rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--text-light);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--terracotta); }
+    .nav-cta {
+      background: var(--sage-dark); color: #fff;
+      font-size: .75rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; text-decoration: none;
+      padding: .65rem 1.5rem; border-radius: 2px;
+      transition: background .2s;
+    }
+    .nav-cta:hover { background: var(--terracotta); }
+
+    /* ── HEADER ── */
+    .page-header {
+      padding: 9rem 5rem 4rem;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-left .section-tag {
+      font-size: .7rem; font-weight: 500; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--terracotta);
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .header-left .section-tag::before {
+      content: ''; display: block; width: 2rem; height: 1px; background: var(--terracotta);
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 300; line-height: 1.1; color: var(--text);
+    }
+    h1 em { font-style: italic; color: var(--sage-dark); }
+    .photo-count {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem; font-weight: 300;
+      color: var(--sage-light); line-height: 1;
+    }
+
+    /* ── ADMIN TOGGLE ── */
+    .admin-toggle {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+    }
+    .admin-toggle button {
+      background: var(--text); color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: .72rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .75rem 1.3rem; border-radius: 2px;
+      display: flex; align-items: center; gap: .5rem;
+      transition: background .2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+    .admin-toggle button:hover { background: var(--terracotta); }
+
+    /* ── MODAL LOGIN ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(44,36,24,.6); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--warm-white);
+      padding: 3rem; width: 100%; max-width: 380px;
+      border-radius: 4px;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .modal h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300; margin-bottom: .5rem;
+    }
+    .modal p { font-size: .82rem; color: var(--text-light); margin-bottom: 2rem; }
+    .modal input {
+      width: 100%; padding: .9rem 1rem;
+      border: 1px solid var(--border); border-radius: 2px;
+      background: var(--cream); color: var(--text);
+      font-family: 'Jost', sans-serif; font-size: .9rem;
+      margin-bottom: 1rem; outline: none;
+      transition: border-color .2s;
+    }
+    .modal input:focus { border-color: var(--sage); }
+    .modal-actions { display: flex; gap: 1rem; }
+    .btn-primary {
+      flex: 1; background: var(--sage-dark); color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: .78rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; padding: .9rem;
+      border-radius: 2px; transition: background .2s;
+    }
+    .btn-primary:hover { background: var(--terracotta); }
+    .btn-ghost-sm {
+      background: none; border: 1px solid var(--border); color: var(--text-light);
+      cursor: pointer; font-family: 'Jost', sans-serif;
+      font-size: .78rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: .9rem 1.2rem; border-radius: 2px; transition: border-color .2s;
+    }
+    .btn-ghost-sm:hover { border-color: var(--text-light); }
+    .modal-error {
+      font-size: .78rem; color: var(--terracotta);
+      margin-bottom: .8rem; display: none;
+    }
+    .modal-error.show { display: block; }
+
+    /* ── ADMIN BAR ── */
+    .admin-bar {
+      display: none;
+      background: var(--sage-dark); color: #fff;
+      padding: 1rem 5rem;
+      align-items: center; justify-content: space-between;
+      gap: 1rem;
+    }
+    .admin-bar.show { display: flex; }
+    .admin-bar-label {
+      font-size: .72rem; letter-spacing: .15em; text-transform: uppercase; opacity: .7;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .admin-bar-label::before {
+      content: '●'; color: #7CFC00; font-size: .5rem;
+      animation: blink 1.5s ease infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .admin-actions { display: flex; gap: 1rem; align-items: center; }
+    .upload-zone-toggle {
+      background: var(--terracotta); color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: .72rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; padding: .6rem 1.2rem;
+      border-radius: 2px; transition: background .2s;
+    }
+    .upload-zone-toggle:hover { background: var(--brown); }
+    .logout-btn {
+      background: rgba(255,255,255,.1); color: #fff;
+      border: 1px solid rgba(255,255,255,.2); cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+      padding: .6rem 1.2rem; border-radius: 2px; transition: background .2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,.2); }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-section {
+      display: none;
+      padding: 2rem 5rem;
+      background: var(--warm-white);
+      border-bottom: 1px solid var(--border);
+      animation: slideDown .3s ease;
+    }
+    .upload-section.show { display: block; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+    .drop-zone {
+      border: 2px dashed var(--sage-light);
+      border-radius: 4px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--sage-dark);
+      background: rgba(138,158,132,.05);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .drop-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 300; color: var(--text);
+      margin-bottom: .5rem;
+    }
+    .drop-sub { font-size: .82rem; color: var(--text-light); }
+
+    .upload-progress { margin-top: 1.5rem; display: none; }
+    .upload-progress.show { display: block; }
+    .progress-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .6rem 0; border-bottom: 1px solid var(--border);
+      font-size: .82rem;
+    }
+    .progress-bar-wrap {
+      flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .progress-bar { height: 100%; background: var(--sage-dark); width: 0%; transition: width .3s; }
+    .progress-status { font-size: .72rem; color: var(--text-light); min-width: 60px; text-align: right; }
+
+    /* ── GALLERY GRID ── */
+    .gallery-section { padding: 3rem 5rem 5rem; }
+
+    .gallery-filters {
+      display: flex; gap: 1rem; margin-bottom: 2.5rem;
+      flex-wrap: wrap; align-items: center;
+    }
+    .filter-label {
+      font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--text-light); margin-right: .5rem;
+    }
+    .filter-btn {
+      background: none; border: 1px solid var(--border);
+      font-family: 'Jost', sans-serif;
+      font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-light); padding: .4rem 1rem;
+      border-radius: 20px; cursor: pointer; transition: all .2s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--sage-dark); border-color: var(--sage-dark); color: #fff;
+    }
+
+    .gallery-grid {
+      columns: 3 280px; gap: 1rem;
+    }
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      position: relative;
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      animation: fadeIn .4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+    .gallery-item img {
+      width: 100%; display: block;
+      transition: transform .4s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.03); }
+    .gallery-item-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(44,36,24,.6) 0%, transparent 50%);
+      opacity: 0; transition: opacity .3s;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 1rem;
+    }
+    .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+    .item-date { font-size: .7rem; color: rgba(255,255,255,.7); letter-spacing: .08em; }
+
+    /* Admin delete button */
+    .delete-btn {
+      display: none;
+      position: absolute; top: .6rem; right: .6rem; z-index: 10;
+      background: rgba(196,120,90,.9); color: #fff;
+      border: none; cursor: pointer; border-radius: 50%;
+      width: 2rem; height: 2rem;
+      font-size: .9rem; transition: background .2s;
+      align-items: center; justify-content: center;
+    }
+    .admin-mode .delete-btn { display: flex; }
+    .delete-btn:hover { background: #a03a1a; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 400;
+      background: rgba(20,16,10,.92);
+      align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .lightbox.show { display: flex; }
+    .lightbox img {
+      max-width: 90vw; max-height: 85vh;
+      object-fit: contain; border-radius: 2px;
+      animation: zoomIn .25s ease;
+    }
+    @keyframes zoomIn { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: rgba(255,255,255,.1); color: #fff;
+      border: none; cursor: pointer; border-radius: 50%;
+      width: 2.5rem; height: 2.5rem;
+      font-size: 1.2rem; transition: background .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,.2); }
+    .lightbox-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.1); color: #fff;
+      border: none; cursor: pointer; border-radius: 50%;
+      width: 3rem; height: 3rem; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .lightbox-nav:hover { background: rgba(255,255,255,.2); }
+    .lightbox-prev { left: 1.5rem; }
+    .lightbox-next { right: 1.5rem; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 5rem 2rem;
+      display: none;
+    }
+    .empty-state.show { display: block; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .3; }
+    .empty-state p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 300; color: var(--text-light);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%);
+      background: var(--text); color: #fff;
+      padding: .8rem 1.5rem; border-radius: 2px;
+      font-size: .82rem; z-index: 500;
+      opacity: 0; transition: opacity .3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .page-header { padding: 7rem 1.5rem 2.5rem; flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .admin-bar { padding: 1rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .upload-section { padding: 1.5rem; }
+      .gallery-section { padding: 2rem 1rem 3rem; }
+      .gallery-grid { columns: 2 150px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Villa <span>Fleurie</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html#maison">Notre maison</a></li>
+    <li><a href="index.html#equipe">Notre équipe</a></li>
+    <li><a href="galerie.html" class="active">Galerie</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+  <a href="tel:069647267" class="nav-cta">Nous appeler</a>
+</nav>
+
+<!-- ADMIN BAR -->
+<div class="admin-bar" id="adminBar">
+  <span class="admin-bar-label">Mode administrateur actif</span>
+  <div class="admin-actions">
+    <button class="upload-zone-toggle" onclick="toggleUpload()">📤 Ajouter des photos</button>
+    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+  </div>
+</div>
+
+<!-- UPLOAD SECTION -->
+<div class="upload-section" id="uploadSection">
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="image/*" multiple/>
+    <div class="drop-icon">🌸</div>
+    <div class="drop-title">Glissez vos photos ici</div>
+    <p class="drop-sub">ou cliquez pour sélectionner · JPG, PNG, WEBP · Plusieurs fichiers acceptés</p>
+  </div>
+  <div class="upload-progress" id="uploadProgress"></div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="header-left">
+    <p class="section-tag">Notre vie en images</p>
+    <h1>La galerie de la<br><em>Villa Fleurie</em></h1>
+  </div>
+  <div class="photo-count" id="photoCount">0</div>
+</div>
+
+<!-- GALLERY -->
+<div class="gallery-section">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🌿</div>
+    <p>Les photos arrivent bientôt…</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">‹</button>
+  <img id="lightboxImg" src="" alt=""/>
+  <button class="lightbox-nav lightbox-next" onclick="navLightbox(1)">›</button>
+</div>
+
+<!-- ADMIN TOGGLE -->
+<div class="admin-toggle" id="adminToggle">
+  <button onclick="showLogin()">🔐 Admin</button>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <h2>Espace <em style="font-style:italic;color:var(--sage-dark)">admin</em></h2>
+    <p>Entrez le mot de passe pour accéder à l'interface de gestion de la galerie.</p>
+    <div class="modal-error" id="loginError">Mot de passe incorrect.</div>
+    <input type="password" id="passwordInput" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPassword()"/>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="checkPassword()">Connexion</button>
+      <button class="btn-ghost-sm" onclick="hideLogin()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── CONFIG ──
+  const CLOUD_NAME = 'dm8ae49gg';
+  const UPLOAD_PRESET = 'Villafleurie';
+  const ADMIN_PASSWORD = 'VillaFleurie2025!'; // ← Change ce mot de passe !
+  const FOLDER = 'villafleurie-galerie';
+
+  // ── STATE ──
+  let isAdmin = false;
+  let photos = [];
+  let lightboxIndex = 0;
+
+  // ── INIT ──
+  loadGallery();
+
+  // ── GALLERY LOAD ──
+  async function loadGallery() {
+    try {
+      const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/${FOLDER}.json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      photos = (data.resources || []).map(r => ({
+        public_id: r.public_id,
+        url: `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/q_auto,f_auto/${r.public_id}`,
+        full: `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/q_auto/${r.public_id}`,
+        created_at: r.created_at
+      }));
+      renderGallery();
+    } catch(e) {
+      renderGallery();
+    }
+  }
+
+  function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+    const empty = document.getElementById('emptyState');
+    const count = document.getElementById('photoCount');
+
+    count.textContent = photos.length;
+
+    if (photos.length === 0) {
+      empty.classList.add('show');
+      grid.innerHTML = '';
+      return;
+    }
+    empty.classList.remove('show');
+
+    grid.innerHTML = photos.map((p, i) => `
+      <div class="gallery-item" onclick="openLightbox(${i})">
+        <img src="${p.url}" alt="Photo Villa Fleurie" loading="lazy"/>
+        <div class="gallery-item-overlay">
+          <span class="item-date">${formatDate(p.created_at)}</span>
+        </div>
+        <button class="delete-btn" onclick="deletePhoto(event, '${p.public_id}', ${i})" title="Supprimer">✕</button>
+      </div>
+    `).join('');
+
+    if (isAdmin) document.getElementById('galleryGrid').classList.add('admin-mode');
+  }
+
+  function formatDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('fr-BE', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  // ── ADMIN ──
+  function showLogin() { document.getElementById('loginModal').classList.add('show'); setTimeout(()=>document.getElementById('passwordInput').focus(),100); }
+  function hideLogin() { document.getElementById('loginModal').classList.remove('show'); document.getElementById('passwordInput').value=''; document.getElementById('loginError').classList.remove('show'); }
+
+  function checkPassword() {
+    const val = document.getElementById('passwordInput').value;
+    if (val === ADMIN_PASSWORD) {
+      isAdmin = true;
+      hideLogin();
+      document.getElementById('adminBar').classList.add('show');
+      document.getElementById('adminToggle').style.display = 'none';
+      document.getElementById('galleryGrid').classList.add('admin-mode');
+      showToast('✅ Connecté en mode administrateur');
+    } else {
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('passwordInput').value = '';
+    }
+  }
+
+  function logout() {
+    isAdmin = false;
+    document.getElementById('adminBar').classList.remove('show');
+    document.getElementById('uploadSection').classList.remove('show');
+    document.getElementById('adminToggle').style.display = '';
+    document.getElementById('galleryGrid').classList.remove('admin-mode');
+    showToast('Déconnecté');
+  }
+
+  function toggleUpload() {
+    document.getElementById('uploadSection').classList.toggle('show');
+  }
+
+  // ── UPLOAD ──
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    uploadFiles([...e.dataTransfer.files]);
+  });
+  fileInput.addEventListener('change', () => uploadFiles([...fileInput.files]));
+
+  async function uploadFiles(files) {
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    if (!imageFiles.length) return;
+
+    const progressEl = document.getElementById('uploadProgress');
+    progressEl.classList.add('show');
+    progressEl.innerHTML = '';
+
+    for (const file of imageFiles) {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'progress-item';
+      itemEl.innerHTML = `
+        <span style="flex:0 0 140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem">${file.name}</span>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="bar-${file.name.replace(/\W/g,'_')}"></div></div>
+        <span class="progress-status" id="status-${file.name.replace(/\W/g,'_')}">0%</span>
+      `;
+      progressEl.appendChild(itemEl);
+
+      await uploadSingle(file);
+    }
+
+    showToast(`✅ ${imageFiles.length} photo(s) ajoutée(s)`);
+    setTimeout(() => { progressEl.classList.remove('show'); progressEl.innerHTML = ''; fileInput.value = ''; }, 2000);
+    await loadGallery();
+  }
+
+  function uploadSingle(file) {
+    return new Promise((resolve) => {
+      const key = file.name.replace(/\W/g,'_');
+      const bar = document.getElementById('bar-' + key);
+      const status = document.getElementById('status-' + key);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', FOLDER);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const pct = Math.round(e.loaded / e.total * 100);
+          if (bar) bar.style.width = pct + '%';
+          if (status) status.textContent = pct + '%';
+        }
+      };
+      xhr.onload = () => {
+        if (status) status.textContent = '✓';
+        resolve();
+      };
+      xhr.onerror = () => { if (status) status.textContent = '✗'; resolve(); };
+      xhr.send(formData);
+    });
+  }
+
+  // ── DELETE ──
+  async function deletePhoto(e, publicId, index) {
+    e.stopPropagation();
+    if (!confirm('Supprimer cette photo définitivement ?')) return;
+
+    // Note: la suppression nécessite l'API key côté serveur.
+    // Sans backend, on peut utiliser un "destroy" unsigned si activé dans Cloudinary,
+    // ou simplement retirer la photo de l'affichage local et informer l'admin de la supprimer manuellement.
+    showToast('⚠️ Pour supprimer définitivement, allez dans votre dashboard Cloudinary.');
+
+    // On retire localement de l'affichage
+    photos.splice(index, 1);
+    renderGallery();
+  }
+
+  // ── LIGHTBOX ──
+  function openLightbox(i) {
+    lightboxIndex = i;
+    document.getElementById('lightboxImg').src = photos[i].full;
+    document.getElementById('lightbox').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  function navLightbox(dir) {
+    lightboxIndex = (lightboxIndex + dir + photos.length) % photos.length;
+    document.getElementById('lightboxImg').src = photos[lightboxIndex].full;
+  }
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('lightbox').classList.contains('show')) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navLightbox(-1);
+      if (e.key === 'ArrowRight') navLightbox(1);
+    }
+    if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('show')) checkPassword();
+  });
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
